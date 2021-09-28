@@ -5,7 +5,10 @@ import {
   Store,
   RequestParameters,
   Variables,
+  Observable,
 } from 'relay-runtime';
+import { GraphQLError } from 'graphql';
+import { createClient } from 'graphql-ws';
 
 // Necessary for Hasura since the IDs are Ints by default.
 // Additionally, Relay requires the IDs to be globally unique,
@@ -42,8 +45,62 @@ async function fetchRelay(params: RequestParameters, variables: Variables) {
   return stringifyIds(data);
 }
 
+const wsClient = createClient({
+  url: 'wss://my-beerdb.hasura.app/v1/graphql',
+  connectionParams: () => {
+    return {
+      headers: {
+        'x-hasura-admin-secret':
+          'xTSP50a866ZstcTKRNNKtHyqM5NupTvQGJcnfMWYKoPfs4wIs4kKsC07LBtI9zFe',
+      },
+    };
+  },
+});
+
+function fetchOrSubscribe(
+  operation: RequestParameters,
+  variables: Variables
+): Observable<any> {
+  return Observable.create((sink) => {
+    if (!operation.text) {
+      return sink.error(new Error('Operation text cannot be empty'));
+    }
+    return wsClient.subscribe(
+      {
+        operationName: operation.name,
+        query: operation.text,
+        variables,
+      },
+      {
+        ...sink,
+        next: (data) => sink.next(stringifyIds(data)),
+        error: (err) => {
+          if (err instanceof Error) {
+            return sink.error(err);
+          }
+
+          if (err instanceof CloseEvent) {
+            return sink.error(
+              // reason will be available on clean closes
+              new Error(
+                `Socket closed with event ${err.code} ${err.reason || ''}`
+              )
+            );
+          }
+
+          return sink.error(
+            new Error(
+              (err as GraphQLError[]).map(({ message }) => message).join(', ')
+            )
+          );
+        },
+      }
+    );
+  });
+}
+
 // Export a singleton instance of Relay Environment configured with our network function:
 export const environment = new Environment({
-  network: Network.create(fetchRelay),
+  network: Network.create(fetchRelay, fetchOrSubscribe),
   store: new Store(new RecordSource()),
 });
