@@ -1,0 +1,195 @@
+schema {
+  query: query_root
+  subscription: subscription_root
+}
+
+"""whether this query should be cached (Hasura Cloud only)"""
+directive @cached(
+  """measured in seconds"""
+  ttl: Int! = 60
+
+  """refresh the cache entry"""
+  refresh: Boolean! = false
+) on QUERY
+
+"""
+columns and relationships of "beer"
+"""
+type beer {
+  id: Int!
+  image: String!
+  name: String!
+}
+
+"""
+Boolean expression to filter rows from the table "beer". All fields are combined with a logical 'AND'.
+"""
+input beer_bool_exp {
+  _and: [beer_bool_exp!]
+  _not: beer_bool_exp
+  _or: [beer_bool_exp!]
+  id: Int_comparison_exp
+  image: String_comparison_exp
+  name: String_comparison_exp
+}
+
+"""Ordering options when selecting data from "beer"."""
+input beer_order_by {
+  id: order_by
+  image: order_by
+  name: order_by
+}
+
+"""
+select columns of table "beer"
+"""
+enum beer_select_column {
+  """column name"""
+  id
+
+  """column name"""
+  image
+
+  """column name"""
+  name
+}
+
+"""
+Boolean expression to compare columns of type "Int". All fields are combined with logical 'AND'.
+"""
+input Int_comparison_exp {
+  _eq: Int
+  _gt: Int
+  _gte: Int
+  _in: [Int!]
+  _is_null: Boolean
+  _lt: Int
+  _lte: Int
+  _neq: Int
+  _nin: [Int!]
+}
+
+"""column ordering options"""
+enum order_by {
+  """in ascending order, nulls last"""
+  asc
+
+  """in ascending order, nulls first"""
+  asc_nulls_first
+
+  """in ascending order, nulls last"""
+  asc_nulls_last
+
+  """in descending order, nulls first"""
+  desc
+
+  """in descending order, nulls first"""
+  desc_nulls_first
+
+  """in descending order, nulls last"""
+  desc_nulls_last
+}
+
+type query_root {
+  """
+  fetch data from the table: "beer"
+  """
+  beer(
+    """distinct select on columns"""
+    distinct_on: [beer_select_column!]
+
+    """limit the number of rows returned"""
+    limit: Int
+
+    """skip the first n rows. Use only with order_by"""
+    offset: Int
+
+    """sort the rows by one or more columns"""
+    order_by: [beer_order_by!]
+
+    """filter the rows returned"""
+    where: beer_bool_exp
+  ): [beer!]!
+
+  """fetch data from the table: "beer" using primary key columns"""
+  beer_by_pk(id: Int!): beer
+}
+
+"""
+Boolean expression to compare columns of type "String". All fields are combined with logical 'AND'.
+"""
+input String_comparison_exp {
+  _eq: String
+  _gt: String
+  _gte: String
+
+  """does the column match the given case-insensitive pattern"""
+  _ilike: String
+  _in: [String!]
+
+  """
+  does the column match the given POSIX regular expression, case insensitive
+  """
+  _iregex: String
+  _is_null: Boolean
+
+  """does the column match the given pattern"""
+  _like: String
+  _lt: String
+  _lte: String
+  _neq: String
+
+  """does the column NOT match the given case-insensitive pattern"""
+  _nilike: String
+  _nin: [String!]
+
+  """
+  does the column NOT match the given POSIX regular expression, case insensitive
+  """
+  _niregex: String
+
+  """does the column NOT match the given pattern"""
+  _nlike: String
+
+  """
+  does the column NOT match the given POSIX regular expression, case sensitive
+  """
+  _nregex: String
+
+  """does the column NOT match the given SQL regular expression"""
+  _nsimilar: String
+
+  """
+  does the column match the given POSIX regular expression, case sensitive
+  """
+  _regex: String
+
+  """does the column match the given SQL regular expression"""
+  _similar: String
+}
+
+type subscription_root {
+  """
+  fetch data from the table: "beer"
+  """
+  beer(
+    """distinct select on columns"""
+    distinct_on: [beer_select_column!]
+
+    """limit the number of rows returned"""
+    limit: Int
+
+    """skip the first n rows. Use only with order_by"""
+    offset: Int
+
+    """sort the rows by one or more columns"""
+    order_by: [beer_order_by!]
+
+    """filter the rows returned"""
+    where: beer_bool_exp
+  ): [beer!]!
+
+  """fetch data from the table: "beer" using primary key columns"""
+  beer_by_pk(id: Int!): beer
+}
+

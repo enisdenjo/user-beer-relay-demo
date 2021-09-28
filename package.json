@@ -12,7 +12,9 @@
     "@types/react-dom": "^17.0.0",
     "react": "^18.0.0-alpha-05726d72c-20210927",
     "react-dom": "^18.0.0-alpha-05726d72c-20210927",
+    "react-relay": "^12.0.0",
     "react-scripts": "4.0.3",
+    "relay-runtime": "^12.0.0",
     "typescript": "^4.1.2",
     "web-vitals": "^1.0.1"
   },
@@ -20,7 +22,9 @@
     "start": "BROWSER=none react-scripts start",
     "build": "react-scripts build",
     "test": "react-scripts test",
-    "eject": "react-scripts eject"
+    "eject": "react-scripts eject",
+    "get-schema": "get-graphql-schema https://my-beerdb.hasura.app/v1/graphql > schema.graphql",
+    "relay": "relay-compiler"
   },
   "eslintConfig": {
     "extends": [
@@ -39,5 +43,15 @@
       "last 1 firefox version",
       "last 1 safari version"
     ]
+  },
+  "devDependencies": {
+    "@types/react-relay": "^11.0.2",
+    "@types/relay-runtime": "^12.0.0",
+    "babel-plugin-relay": "^12.0.0",
+    "get-graphql-schema": "^2.1.2",
+    "graphql": "^15.6.0",
+    "relay-compiler": "^12.0.0",
+    "relay-compiler-language-typescript": "^14.1.1",
+    "relay-config": "^12.0.0"
   }
 }
